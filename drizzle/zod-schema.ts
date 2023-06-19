@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { about, service } from './schema'
+import { about, experienceArea, service } from './schema'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
 export const createAboutSchema = createInsertSchema(about, {
@@ -15,3 +15,9 @@ export const createServiceSchema = createInsertSchema(service).omit({
 })
 
 export const updateServiceSchema = createServiceSchema.partial()
+
+export const createExperienceAreaSchema = createInsertSchema(experienceArea).omit({
+  id: true,
+})
+
+export const updateExperienceAreaSchema = createExperienceAreaSchema.partial()
