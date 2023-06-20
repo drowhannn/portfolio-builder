@@ -11,9 +11,8 @@ export default defineEventHandler(async (event) => {
     .select()
     .from(service)
     .where(eq(service.id, Number(id)))
-  if (!response.length)
-    return {
-      message: 'Resource not found',
-    }
+  if (!response.length) {
+    throw Error('Resource not found.')
+  }
   return response[0]
 })

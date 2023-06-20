@@ -14,6 +14,9 @@ export default defineEventHandler(async (event) => {
     .update(experienceArea)
     .set(validatedBody)
     .where(eq(experienceArea.id, Number(id)))
-  // TODO: Test using id which doesn't exist
-  return response
+    .returning()
+  if (!response.length) {
+    throw Error('Resource not found.')
+  }
+  return response[0]
 })

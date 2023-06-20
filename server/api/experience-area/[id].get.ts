@@ -11,9 +11,6 @@ export default defineEventHandler(async (event) => {
     .select()
     .from(experienceArea)
     .where(eq(experienceArea.id, Number(id)))
-  if (!response.length)
-    return {
-      message: 'Resource not found',
-    }
+  if (!response.length) throw Error('Resource not found.')
   return response[0]
 })
