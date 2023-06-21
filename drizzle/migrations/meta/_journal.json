@@ -15,6 +15,13 @@
       "when": 1686848955879,
       "tag": "0001_boring_grey_gargoyle",
       "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1687366317413,
+      "tag": "0002_sparkling_dark_beast",
+      "breakpoints": false
     }
   ]
 }
