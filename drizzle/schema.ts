@@ -68,12 +68,12 @@ export const blogCategory = pgTable('blog_category', {
   title: varchar('title', { length: 256 }).notNull(),
 })
 
-export const blogTags = pgTable('blog_tags', {
+export const blogTag = pgTable('blog_tag', {
   id: serial('id').primaryKey(),
   title: varchar('title', { length: 256 }).notNull(),
 })
 
-export const blogComments = pgTable('blog_comments', {
+export const blogComment = pgTable('blog_comment', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 256 }).notNull(),
   email: varchar('email', { length: 256 }).notNull(),
@@ -88,6 +88,6 @@ export const blogRelations = relations(blog, ({ one, many }) => ({
     fields: [blog.blogCategoryId],
     references: [blogCategory.id],
   }),
-  tags: many(blogTags),
-  comments: many(blogComments),
+  tags: many(blogTag),
+  comments: many(blogComment),
 }))

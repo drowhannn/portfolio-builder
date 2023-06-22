@@ -1,6 +1,5 @@
-import { z } from 'zod'
 import { about, experienceArea, service, testimonial } from './schema'
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import { createInsertSchema } from 'drizzle-zod'
 
 export const createAboutSchema = createInsertSchema(about, {
   contactEmail: (schema) => schema.contactEmail.email(),
