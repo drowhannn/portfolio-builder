@@ -22,7 +22,7 @@ export const experienceArea = pgTable('experience_area', {
   description: text('description').notNull(),
 })
 
-export const testimonials = pgTable('testimonials', {
+export const testimonial = pgTable('testimonial', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 256 }).notNull(),
   position: varchar('position', { length: 256 }).notNull(),
