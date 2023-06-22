@@ -27,3 +27,9 @@ export const createTestimonialSchema = createInsertSchema(testimonial).omit({
 })
 
 export const updateTestimonialSchema = createTestimonialSchema.partial()
+
+export const createWorkCategorySchema = createInsertSchema(testimonial).omit({
+  id: true,
+})
+
+export const updateWorkCategorySchema = createWorkCategorySchema.partial()
