@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm'
 import { integer, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core'
+import { on } from 'events'
 
 export const about = pgTable('about', {
   id: serial('id').primaryKey(),
@@ -37,7 +38,10 @@ export const work = pgTable('work', {
   description: text('description').notNull(),
   image: varchar('image', { length: 256 }).notNull(),
   categoryId: integer('category_id')
-    .references(() => workCategory.id)
+    .references(() => workCategory.id, {
+      onUpdate: 'cascade',
+      onDelete: 'set null',
+    })
     .notNull(),
 })
 
@@ -59,7 +63,10 @@ export const blog = pgTable('blog', {
   description: text('description').notNull(),
   image: varchar('image', { length: 256 }).notNull(),
   blogCategoryId: integer('blog_category_id')
-    .references(() => blogCategory.id)
+    .references(() => blogCategory.id, {
+      onUpdate: 'cascade',
+      onDelete: 'cascade',
+    })
     .notNull(),
 })
 

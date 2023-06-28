@@ -36,6 +36,20 @@
       "when": 1687451902120,
       "tag": "0004_left_diamondback",
       "breakpoints": false
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1687886082785,
+      "tag": "0005_real_corsair",
+      "breakpoints": false
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1687965339112,
+      "tag": "0006_purple_ronan",
+      "breakpoints": false
     }
   ]
 }

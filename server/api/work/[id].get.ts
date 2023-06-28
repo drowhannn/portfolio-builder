@@ -7,6 +7,12 @@ export default defineEventHandler(async (event) => {
   if (!Number(id)) {
     throw Error('Id should be number.')
   }
-  await db.delete(work).where(eq(work.id, Number(id)))
-  return {}
+  const response = await db
+    .select()
+    .from(work)
+    .where(eq(work.id, Number(id)))
+  if (!response.length) {
+    throw Error('Resource not found.')
+  }
+  return response[0]
 })
