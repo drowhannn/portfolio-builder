@@ -1,4 +1,4 @@
-import { about, blogCategory, experienceArea, service, testimonial, work, workCategory } from './schema'
+import { about, blog, blogCategory, experienceArea, service, testimonial, work, workCategory } from './schema'
 import { createInsertSchema } from 'drizzle-zod'
 
 export const createAboutSchema = createInsertSchema(about, {
@@ -50,3 +50,9 @@ export const createBlogTagSchema = createInsertSchema(blogCategory).omit({
 })
 
 export const updateBlogTagSchema = createBlogTagSchema.partial()
+
+export const createBlogSchema = createInsertSchema(blog).omit({
+  id: true,
+})
+
+export const updateBlogSchema = createBlogSchema.partial()
