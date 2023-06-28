@@ -38,16 +38,8 @@ export const work = pgTable('work', {
   description: text('description').notNull(),
   image: varchar('image', { length: 256 }).notNull(),
   categoryId: integer('category_id')
-    .references(() => workCategory.id, {
-      onUpdate: 'cascade',
-      onDelete: 'set null',
-    })
+    .references(() => workCategory.id)
     .notNull(),
-})
-
-export const workCategory = pgTable('work_category', {
-  id: serial('id').primaryKey(),
-  title: varchar('title', { length: 256 }).notNull(),
 })
 
 export const workRelations = relations(work, ({ one }) => ({
@@ -57,28 +49,51 @@ export const workRelations = relations(work, ({ one }) => ({
   }),
 }))
 
+export const workCategory = pgTable('work_category', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 256 }).notNull(),
+})
+
+export const workCategoryRelations = relations(workCategory, ({ many }) => ({
+  works: many(work),
+}))
+
 export const blog = pgTable('blog', {
   id: serial('id').primaryKey(),
   title: varchar('title', { length: 256 }).notNull(),
   description: text('description').notNull(),
   image: varchar('image', { length: 256 }).notNull(),
   blogCategoryId: integer('blog_category_id')
-    .references(() => blogCategory.id, {
-      onUpdate: 'cascade',
-      onDelete: 'cascade',
-    })
+    .references(() => blogCategory.id)
     .notNull(),
 })
+
+export const blogRelations = relations(blog, ({ one, many }) => ({
+  category: one(blogCategory, {
+    fields: [blog.blogCategoryId],
+    references: [blogCategory.id],
+  }),
+  tags: many(blogTag),
+  comments: many(blogComment),
+}))
 
 export const blogCategory = pgTable('blog_category', {
   id: serial('id').primaryKey(),
   title: varchar('title', { length: 256 }).notNull(),
 })
 
+export const blogCategoryRelations = relations(blogCategory, ({ many }) => ({
+  blogs: many(blog),
+}))
+
 export const blogTag = pgTable('blog_tag', {
   id: serial('id').primaryKey(),
   title: varchar('title', { length: 256 }).notNull(),
 })
+
+export const blogTagRelations = relations(blogTag, ({ many }) => ({
+  blogs: many(blog),
+}))
 
 export const blogComment = pgTable('blog_comment', {
   id: serial('id').primaryKey(),
@@ -90,11 +105,9 @@ export const blogComment = pgTable('blog_comment', {
     .notNull(),
 })
 
-export const blogRelations = relations(blog, ({ one, many }) => ({
-  category: one(blogCategory, {
-    fields: [blog.blogCategoryId],
-    references: [blogCategory.id],
+export const blogCommentRelations = relations(blogComment, ({ one }) => ({
+  blog: one(blog, {
+    fields: [blogComment.blogId],
+    references: [blog.id],
   }),
-  tags: many(blogTag),
-  comments: many(blogComment),
 }))
