@@ -44,3 +44,9 @@ export const createWorkSchema = createInsertSchema(work).omit({
 })
 
 export const updateWorkSchema = createWorkSchema.partial()
+
+export const createBlogTagSchema = createInsertSchema(blogCategory).omit({
+  id: true,
+})
+
+export const updateBlogTagSchema = createBlogTagSchema.partial()
