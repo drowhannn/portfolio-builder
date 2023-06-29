@@ -7,11 +7,11 @@ export default defineEventHandler(async (event) => {
   const page = Number(getQuery(event)['page']) || 1
 
   const results = await db.query.blog.findMany({
+    limit: config.pageSize,
+    offset: (page - 1) * config.pageSize,
     with: {
       tags: true,
     },
-    limit: config.pageSize,
-    offset: (page - 1) * config.pageSize,
   })
 
   const totalCount = await db.select({ count: sql<number>`count(*)` }).from(blog)

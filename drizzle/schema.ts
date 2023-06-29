@@ -42,21 +42,10 @@ export const work = pgTable('work', {
     .notNull(),
 })
 
-export const workRelations = relations(work, ({ one }) => ({
-  category: one(workCategory, {
-    fields: [work.categoryId],
-    references: [workCategory.id],
-  }),
-}))
-
 export const workCategory = pgTable('work_category', {
   id: serial('id').primaryKey(),
   title: varchar('title', { length: 256 }).notNull(),
 })
-
-export const workCategoryRelations = relations(workCategory, ({ many }) => ({
-  works: many(work),
-}))
 
 export const blog = pgTable('blog', {
   id: serial('id').primaryKey(),
@@ -68,32 +57,15 @@ export const blog = pgTable('blog', {
     .notNull(),
 })
 
-export const blogRelations = relations(blog, ({ one, many }) => ({
-  category: one(blogCategory, {
-    fields: [blog.blogCategoryId],
-    references: [blogCategory.id],
-  }),
-  tags: many(blogTag),
-  comments: many(blogComment),
-}))
-
 export const blogCategory = pgTable('blog_category', {
   id: serial('id').primaryKey(),
   title: varchar('title', { length: 256 }).notNull(),
 })
 
-export const blogCategoryRelations = relations(blogCategory, ({ many }) => ({
-  blogs: many(blog),
-}))
-
 export const blogTag = pgTable('blog_tag', {
   id: serial('id').primaryKey(),
   title: varchar('title', { length: 256 }).notNull(),
 })
-
-export const blogTagRelations = relations(blogTag, ({ many }) => ({
-  blogs: many(blog),
-}))
 
 export const blogComment = pgTable('blog_comment', {
   id: serial('id').primaryKey(),
@@ -105,9 +77,37 @@ export const blogComment = pgTable('blog_comment', {
     .notNull(),
 })
 
+export const workCategoryRelations = relations(workCategory, ({ many }) => ({
+  works: many(work),
+}))
+
 export const blogCommentRelations = relations(blogComment, ({ one }) => ({
   blog: one(blog, {
     fields: [blogComment.blogId],
     references: [blog.id],
+  }),
+}))
+
+export const blogCategoryRelations = relations(blogCategory, ({ many }) => ({
+  blogs: many(blog),
+}))
+
+export const blogTagRelations = relations(blogTag, ({ many }) => ({
+  blogs: many(blog),
+}))
+
+export const blogRelations = relations(blog, ({ one, many }) => ({
+  category: one(blogCategory, {
+    fields: [blog.blogCategoryId],
+    references: [blogCategory.id],
+  }),
+  tags: many(blogTag),
+  comments: many(blogComment),
+}))
+
+export const workRelations = relations(work, ({ one }) => ({
+  category: one(workCategory, {
+    fields: [work.categoryId],
+    references: [workCategory.id],
   }),
 }))
