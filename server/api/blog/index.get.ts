@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
     offset: (page - 1) * config.pageSize,
     with: {
       tags: true,
+      category: true,
     },
   })
 

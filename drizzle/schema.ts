@@ -1,6 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { integer, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core'
-import { on } from 'events'
+import { integer, pgTable, primaryKey, serial, text, varchar } from 'drizzle-orm/pg-core'
 
 export const about = pgTable('about', {
   id: serial('id').primaryKey(),
@@ -109,5 +108,31 @@ export const workRelations = relations(work, ({ one }) => ({
   category: one(workCategory, {
     fields: [work.categoryId],
     references: [workCategory.id],
+  }),
+}))
+
+export const blogsToBlogTags = pgTable(
+  'blogs_to_blog_tags',
+  {
+    blogId: integer('blog_id')
+      .notNull()
+      .references(() => blog.id),
+    blogTagId: integer('blog_tag_id')
+      .notNull()
+      .references(() => blogTag.id),
+  },
+  (t) => ({
+    pk: primaryKey(t.blogId, t.blogTagId),
+  })
+)
+
+export const blogsToBlogTagsRelations = relations(blogsToBlogTags, ({ one }) => ({
+  blogTag: one(blogTag, {
+    fields: [blogsToBlogTags.blogTagId],
+    references: [blogTag.id],
+  }),
+  user: one(blog, {
+    fields: [blogsToBlogTags.blogId],
+    references: [blog.id],
   }),
 }))
