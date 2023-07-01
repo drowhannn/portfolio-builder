@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { about, blog, blogCategory, experienceArea, service, testimonial, work, workCategory } from './schema'
+import { about, blog, blogCategory, blogComment, experienceArea, service, testimonial, work, workCategory } from './schema'
 import { createInsertSchema } from 'drizzle-zod'
 
 export const createAboutSchema = createInsertSchema(about, {
@@ -61,3 +61,10 @@ export const createBlogSchema = createInsertSchema(blog)
   })
 
 export const updateBlogSchema = createBlogSchema.partial()
+
+export const createBlogCommentSchema = createInsertSchema(blogComment).omit({
+  id: true,
+})
+
+export const updateBlogCommentSchema = createBlogCommentSchema.partial()
+
