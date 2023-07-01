@@ -9,6 +9,14 @@ export default defineEventHandler(async (event) => {
   }
   const response = await db.query.blog.findFirst({
     where: eq(blog.id, Number(id)),
+    with: {
+      tags: {
+        with: {
+          blogTag: true,
+        },
+      },
+      category: true,
+    },
   })
 
   if (!response) {

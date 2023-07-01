@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { about, blog, blogCategory, experienceArea, service, testimonial, work, workCategory } from './schema'
 import { createInsertSchema } from 'drizzle-zod'
 
@@ -51,8 +52,12 @@ export const createBlogTagSchema = createInsertSchema(blogCategory).omit({
 
 export const updateBlogTagSchema = createBlogTagSchema.partial()
 
-export const createBlogSchema = createInsertSchema(blog).omit({
-  id: true,
-})
+export const createBlogSchema = createInsertSchema(blog)
+  .omit({
+    id: true,
+  })
+  .extend({
+    tags: z.array(z.number()).optional(),
+  })
 
 export const updateBlogSchema = createBlogSchema.partial()

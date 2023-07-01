@@ -10,7 +10,11 @@ export default defineEventHandler(async (event) => {
     limit: config.pageSize,
     offset: (page - 1) * config.pageSize,
     with: {
-      tags: true,
+      tags: {
+        with: {
+          blogTag: true,
+        },
+      },
       category: true,
     },
   })
