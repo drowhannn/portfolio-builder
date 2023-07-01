@@ -92,7 +92,7 @@ export const blogCategoryRelations = relations(blogCategory, ({ many }) => ({
 }))
 
 export const blogTagRelations = relations(blogTag, ({ many }) => ({
-  blogs: many(blog),
+  blogs: many(blogsToBlogTags),
 }))
 
 export const blogRelations = relations(blog, ({ one, many }) => ({
@@ -100,7 +100,7 @@ export const blogRelations = relations(blog, ({ one, many }) => ({
     fields: [blog.blogCategoryId],
     references: [blogCategory.id],
   }),
-  tags: many(blogTag),
+  tags: many(blogsToBlogTags),
   comments: many(blogComment),
 }))
 
