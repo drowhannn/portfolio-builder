@@ -7,12 +7,12 @@ export default defineEventHandler(async (event) => {
   if (!Number(id)) {
     throw Error('Id should be number.')
   }
-  const response = await db
-    .select()
-    .from(blog)
-    .where(eq(blog.id, Number(id)))
-  if (!response.length) {
+  const response = await db.query.blog.findFirst({
+    where: eq(blog.id, Number(id)),
+  })
+
+  if (!response) {
     throw Error('Resource not found.')
   }
-  return response[0]
+  return response
 })
