@@ -131,7 +131,7 @@ export const blogsToBlogTagsRelations = relations(blogsToBlogTags, ({ one }) => 
     fields: [blogsToBlogTags.blogTagId],
     references: [blogTag.id],
   }),
-  user: one(blog, {
+  blog: one(blog, {
     fields: [blogsToBlogTags.blogId],
     references: [blog.id],
   }),

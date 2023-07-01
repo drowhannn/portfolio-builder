@@ -5,64 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1686792881517,
-      "tag": "0000_groovy_kree",
-      "breakpoints": false
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1686848955879,
-      "tag": "0001_boring_grey_gargoyle",
-      "breakpoints": false
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1687366317413,
-      "tag": "0002_sparkling_dark_beast",
-      "breakpoints": false
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1687397919742,
-      "tag": "0003_clever_ted_forrester",
-      "breakpoints": false
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1687451902120,
-      "tag": "0004_left_diamondback",
-      "breakpoints": false
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1687886082785,
-      "tag": "0005_real_corsair",
-      "breakpoints": false
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1687965339112,
-      "tag": "0006_purple_ronan",
-      "breakpoints": false
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1687965735604,
-      "tag": "0007_bitter_shadow_king",
-      "breakpoints": false
-    },
-    {
-      "idx": 8,
-      "version": "5",
-      "when": 1688088829933,
-      "tag": "0008_tough_silver_centurion",
+      "when": 1688219870712,
+      "tag": "0000_gifted_sharon_carter",
       "breakpoints": false
     }
   ]

@@ -1,5 +1,7 @@
+import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import * as schema from './schema'
-import { drizzle } from 'drizzle-orm/postgres-js'
 
-export const db = drizzle(postgres('postgresql://postgres:postgres@localhost:5432/portfoliodb'), { schema })
+// for query purposes
+const queryClient = postgres('postgresql://postgres:postgres@localhost:5432/portfoliodb')
+export const db = drizzle(queryClient, { schema })

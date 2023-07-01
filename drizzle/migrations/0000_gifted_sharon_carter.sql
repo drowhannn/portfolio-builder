@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS "about" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(256) NOT NULL,
+	"position" varchar(256) NOT NULL,
+	"description" text NOT NULL,
+	"contact_email" varchar(256) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS "blog" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" varchar(256) NOT NULL,
@@ -11,7 +19,7 @@ CREATE TABLE IF NOT EXISTS "blog_category" (
 	"title" varchar(256) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "blog_comments" (
+CREATE TABLE IF NOT EXISTS "blog_comment" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(256) NOT NULL,
 	"email" varchar(256) NOT NULL,
@@ -19,12 +27,32 @@ CREATE TABLE IF NOT EXISTS "blog_comments" (
 	"blog_id" integer NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "blog_tags" (
+CREATE TABLE IF NOT EXISTS "blog_tag" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" varchar(256) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "testimonials" (
+CREATE TABLE IF NOT EXISTS "blogs_to_blog_tags" (
+	"blog_id" integer NOT NULL,
+	"blog_tag_id" integer NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "blogs_to_blog_tags" ADD CONSTRAINT "blogs_to_blog_tags_blog_id_blog_tag_id" PRIMARY KEY("blog_id","blog_tag_id");
+
+CREATE TABLE IF NOT EXISTS "experience_area" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" varchar(256) NOT NULL,
+	"description" text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "service" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" varchar(256) NOT NULL,
+	"description" text NOT NULL,
+	"icon" varchar(256) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "testimonial" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(256) NOT NULL,
 	"position" varchar(256) NOT NULL,
@@ -53,7 +81,19 @@ EXCEPTION
 END $$;
 
 DO $$ BEGIN
- ALTER TABLE "blog_comments" ADD CONSTRAINT "blog_comments_blog_id_blog_id_fk" FOREIGN KEY ("blog_id") REFERENCES "blog"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "blog_comment" ADD CONSTRAINT "blog_comment_blog_id_blog_id_fk" FOREIGN KEY ("blog_id") REFERENCES "blog"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+ ALTER TABLE "blogs_to_blog_tags" ADD CONSTRAINT "blogs_to_blog_tags_blog_id_blog_id_fk" FOREIGN KEY ("blog_id") REFERENCES "blog"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+ ALTER TABLE "blogs_to_blog_tags" ADD CONSTRAINT "blogs_to_blog_tags_blog_tag_id_blog_tag_id_fk" FOREIGN KEY ("blog_tag_id") REFERENCES "blog_tag"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

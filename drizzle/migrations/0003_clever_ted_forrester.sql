@@ -1,1 +1,0 @@
-ALTER TABLE "testimonials" RENAME TO "testimonial";
