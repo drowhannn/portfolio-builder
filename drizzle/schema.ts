@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { integer, pgTable, primaryKey, serial, text, varchar } from 'drizzle-orm/pg-core'
+import { integer, pgTable, primaryKey, serial, text, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
 
 export const about = pgTable('about', {
   id: serial('id').primaryKey(),
@@ -137,9 +137,17 @@ export const blogsToBlogTagsRelations = relations(blogsToBlogTags, ({ one }) => 
   }),
 }))
 
-export const user = pgTable('user', {
-  id: serial('id').primaryKey(),
-  email: varchar('email', { length: 256 }).notNull(),
-  password: varchar('password', { length: 256 }).notNull(),
-  name: varchar('name', { length: 256 }).notNull(),
-})
+export const user = pgTable(
+  'user',
+  {
+    id: serial('id').primaryKey(),
+    email: varchar('email', { length: 256 }).notNull(),
+    password: varchar('password', { length: 256 }).notNull(),
+    name: varchar('name', { length: 256 }).notNull(),
+  },
+  (table) => {
+    return {
+      emailIdx: uniqueIndex('email_idx').on(table.email),
+    }
+  }
+)
