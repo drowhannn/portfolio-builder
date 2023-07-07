@@ -136,3 +136,10 @@ export const blogsToBlogTagsRelations = relations(blogsToBlogTags, ({ one }) => 
     references: [blog.id],
   }),
 }))
+
+export const user = pgTable('user', {
+  id: serial('id').primaryKey(),
+  email: varchar('email', { length: 256 }).notNull(),
+  password: varchar('password', { length: 256 }).notNull(),
+  name: varchar('name', { length: 256 }).notNull(),
+})
