@@ -3,6 +3,7 @@ import { db } from '../../drizzle/db'
 import { PgTableWithColumns } from 'drizzle-orm/pg-core'
 import { H3Event } from 'h3'
 import { sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
 interface CreateOptions<T extends PgTableWithColumns<any>> {
   model: T
@@ -48,4 +49,27 @@ export async function list<T extends PgTableWithColumns<any>, S extends z.ZodSch
       size: pageSize,
     },
   }
+}
+
+interface RetrieveOptions<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>> {
+  model: T
+  schema: S
+}
+
+export async function retrieve<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>>(
+  event: H3Event,
+  { model, schema }: RetrieveOptions<T, S>
+) {
+  const id = getRouterParam(event, 'id')
+  if (!Number(id)) {
+    throw Error('Id should be number.')
+  }
+  const response = await db
+    .select()
+    .from(model)
+    .where(eq(model.id, Number(id)))
+  if (!response.length) {
+    throw Error('Resource not found.')
+  }
+  return schema.parse(response[0]!) as ReturnType<S['parse']>
 }

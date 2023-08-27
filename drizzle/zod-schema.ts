@@ -11,7 +11,7 @@ import {
   work,
   workCategory,
 } from './schema'
-import { createInsertSchema } from 'drizzle-zod'
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
 export const createAboutSchema = createInsertSchema(about, {
   contactEmail: (schema) => schema.contactEmail.email(),
@@ -61,7 +61,9 @@ export const createBlogTagSchema = createInsertSchema(blogTag).omit({
   id: true,
 })
 
-export const listBlogTagSchema = z.array(createInsertSchema(blogTag))
+export const listBlogTagSchema = createSelectSchema(blogTag)
+
+export const retrieveBlogTagSchema = createSelectSchema(blogTag)
 
 export const updateBlogTagSchema = createBlogTagSchema.partial()
 
