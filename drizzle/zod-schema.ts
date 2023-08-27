@@ -67,13 +67,9 @@ export const retrieveBlogTagSchema = createSelectSchema(blogTag)
 
 export const updateBlogTagSchema = createBlogTagSchema.partial()
 
-export const createBlogSchema = createInsertSchema(blog)
-  .omit({
-    id: true,
-  })
-  .extend({
-    tags: z.array(z.number()).optional(),
-  })
+export const createBlogSchema = createInsertSchema(blog).omit({
+  id: true,
+})
 
 export const retrieveBlogSchema = createSelectSchema(blog)
 

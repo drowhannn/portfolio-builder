@@ -7,14 +7,53 @@ import { eq } from 'drizzle-orm'
 
 interface CreateOptions<T extends PgTableWithColumns<any>> {
   model: T
-  schema: z.ZodSchema<any>
+  schema: z.ZodObject<any>
+  manyToManyRelationships: {
+    model: PgTableWithColumns<any>
+    accessorKey: string
+    foreignKey: string
+    foreignKeyAccessor: string
+  }[]
 }
 
-export async function create<T extends PgTableWithColumns<any>>(event: H3Event, { model, schema }: CreateOptions<T>) {
+export async function create<T extends PgTableWithColumns<any>>(
+  event: H3Event,
+  { model, schema, manyToManyRelationships = [] }: CreateOptions<T>
+) {
   const body = await readBody(event)
-  const validatedBody = schema.parse(body)
-  const response = await db.insert(model).values(validatedBody).returning()
-  return response[0]!
+
+  const accessorKeys = manyToManyRelationships.map(({ accessorKey }) => accessorKey)
+
+  const extendedSchema = schema.extend(
+    Object.fromEntries(accessorKeys.map((accessorKey) => [accessorKey, z.array(z.number()).optional()]))
+  )
+
+  const validatedBody = extendedSchema.parse(body)
+
+  const m2m = Object.fromEntries(accessorKeys.map((accessorKey) => [accessorKey, validatedBody[accessorKey] || []]))
+
+  const newData = Object.fromEntries(Object.entries(validatedBody).filter(([key]) => !accessorKeys.includes(key)))
+
+  const res = await db.transaction(async (tx) => {
+    // @ts-ignore
+    const response = await tx.insert(model).values(newData).returning()
+    if (m2m) {
+      for (const [accessorKey, values] of Object.entries(m2m)) {
+        const m2mrelationship = manyToManyRelationships.find(({ accessorKey: ak }) => ak === accessorKey)
+        await tx
+          .insert(m2mrelationship!.model)
+          .values(
+            values.map((value) => ({
+              [m2mrelationship!.foreignKey]: response[0]!.id,
+              [m2mrelationship!.foreignKeyAccessor]: value,
+            }))
+          )
+          .returning()
+      }
+    }
+    return response[0]
+  })
+  return res
 }
 
 interface ListOptions<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>> {
