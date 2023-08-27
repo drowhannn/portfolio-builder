@@ -73,3 +73,29 @@ export async function retrieve<T extends PgTableWithColumns<any>, S extends z.Zo
   }
   return schema.parse(response[0]!) as ReturnType<S['parse']>
 }
+
+interface UpdateOptions<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>> {
+  model: T
+  schema: S
+}
+
+export async function update<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>>(
+  event: H3Event,
+  { model, schema }: UpdateOptions<T, S>
+) {
+  const id = getRouterParam(event, 'id')
+  if (!Number(id)) {
+    throw Error('Id should be number.')
+  }
+  const body = await readBody(event)
+  const validatedBody = schema.parse(body)
+  const response = await db
+    .update(model)
+    .set(validatedBody)
+    .where(eq(model.id, Number(id)))
+    .returning()
+  if (!response.length) {
+    throw Error('Resource not found.')
+  }
+  return response[0]!
+}

@@ -1,22 +1,11 @@
-import { eq } from 'drizzle-orm'
-import { db } from '../../../drizzle/db'
 import { blogTag } from '../../../drizzle/schema'
 import { updateBlogTagSchema } from '../../../drizzle/zod-schema'
+import { update } from '../../utils/rest'
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  if (!Number(id)) {
-    throw Error('Id should be number.')
-  }
-  const body = await readBody(event)
-  const validatedBody = updateBlogTagSchema.parse(body)
-  const response = await db
-    .update(blogTag)
-    .set(validatedBody)
-    .where(eq(blogTag.id, Number(id)))
-    .returning()
-  if (!response.length) {
-    throw Error('Resource not found.')
-  }
-  return response[0]
+  const response = await update(event, {
+    model: blogTag,
+    schema: updateBlogTagSchema,
+  })
+  return response
 })
