@@ -99,3 +99,16 @@ export async function update<T extends PgTableWithColumns<any>, S extends z.ZodS
   }
   return response[0]!
 }
+
+interface DeleteOptions<T extends PgTableWithColumns<any>> {
+  model: T
+}
+
+export async function destroy<T extends PgTableWithColumns<any>>(event: H3Event, { model }: DeleteOptions<T>) {
+  const id = getRouterParam(event, 'id')
+  if (!Number(id)) {
+    throw Error('Id should be number.')
+  }
+  await db.delete(model).where(eq(model.id, Number(id)))
+  return {}
+}
