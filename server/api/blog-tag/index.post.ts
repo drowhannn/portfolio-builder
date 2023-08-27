@@ -1,10 +1,10 @@
 import { blogTag } from '../../../drizzle/schema'
 import { createBlogTagSchema } from '../../../drizzle/zod-schema'
 
-import { handleRest } from '../../utils/rest'
+import { create } from '../../utils/rest'
 
 export default defineEventHandler(async (event) => {
-  const response = await handleRest(event, {
+  const response = await create(event, {
     model: blogTag,
     schema: createBlogTagSchema,
   })

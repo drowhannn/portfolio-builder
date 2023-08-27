@@ -2,46 +2,50 @@ import { z } from 'zod'
 import { db } from '../../drizzle/db'
 import { PgTableWithColumns } from 'drizzle-orm/pg-core'
 import { H3Event } from 'h3'
-
-type SchemaType =
-  | {
-      create: z.ZodSchema<any>
-      update: z.ZodSchema<any>
-    }
-  | z.ZodSchema<any>
-
-interface RestAPIOptions<T extends PgTableWithColumns<any>> {
-  model: T
-  schema: SchemaType
-}
+import { sql } from 'drizzle-orm'
 
 interface CreateOptions<T extends PgTableWithColumns<any>> {
   model: T
   schema: z.ZodSchema<any>
 }
 
-async function create<T extends PgTableWithColumns<any>>(event: H3Event, { model, schema }: CreateOptions<T>) {
+export async function create<T extends PgTableWithColumns<any>>(event: H3Event, { model, schema }: CreateOptions<T>) {
   const body = await readBody(event)
   const validatedBody = schema.parse(body)
   const response = await db.insert(model).values(validatedBody).returning()
   return response[0]!
 }
 
-export async function handleRest<T extends PgTableWithColumns<any>>(
+interface ListOptions<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>> {
+  model: T
+  schema: S
+}
+
+export async function list<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>>(
   event: H3Event,
-  { model, schema }: RestAPIOptions<T>
+  { model, schema }: ListOptions<T, S>
 ) {
-  const method = getMethod(event)
-  if (method === 'POST') {
-    try {
-      return await create(event, { model, schema: 'create' in schema ? schema.create : schema })
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        return err.issues
-      }
-      return {
-        error: 'Something went wrong',
-      }
-    }
+  const page = Number(getQuery(event)['page']) || 1
+
+  const config = useRuntimeConfig() as { pageSize?: number }
+
+  const pageSize = config.pageSize || 10
+
+  const results = await db
+    .select()
+    .from(model)
+    .limit(pageSize)
+    .offset((page - 1) * pageSize)
+
+  const totalCount = await db.select({ count: sql<number>`count(*)` }).from(model)
+
+  return {
+    results: z.array(schema).parse(results),
+    pagination: {
+      page,
+      pages: Math.ceil(totalCount[0]!.count / pageSize),
+      total: totalCount[0]!.count,
+      size: pageSize,
+    },
   }
 }
