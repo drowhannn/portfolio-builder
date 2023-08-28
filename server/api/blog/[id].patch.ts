@@ -1,10 +1,10 @@
-import { blogCategory, blogsToBlogTags } from '../../../drizzle/schema'
-import { updateBlogCategorySchema } from '../../../drizzle/zod-schema'
+import { blog, blogsToBlogTags } from '../../../drizzle/schema'
+import { updateBlogSchema } from '../../../drizzle/zod-schema'
 
 export default defineEventHandler(async (event) => {
-  return await update(event, {
-    model: blogCategory,
-    schema: updateBlogCategorySchema,
+  const response = await update(event, {
+    model: blog,
+    schema: updateBlogSchema,
     manyToManyRelationships: [
       {
         model: blogsToBlogTags,
@@ -14,4 +14,5 @@ export default defineEventHandler(async (event) => {
       },
     ],
   })
+  return response
 })

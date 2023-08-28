@@ -130,22 +130,6 @@ export async function update<T extends PgTableWithColumns<any>, S extends z.ZodO
   event: H3Event,
   { model, schema, manyToManyRelationships = [] }: UpdateOptions<T, S>
 ) {
-  // const id = getRouterParam(event, 'id')
-  // if (!Number(id)) {
-  //   throw Error('Id should be number.')
-  // }
-  // const body = await readBody(event)
-  // const validatedBody = schema.parse(body)
-  // const response = await db
-  //   .update(model)
-  //   .set(validatedBody)
-  //   .where(eq(model.id, Number(id)))
-  //   .returning()
-  // if (!response.length) {
-  //   throw Error('Resource not found.')
-  // }
-  // return response[0]!
-
   const id = getRouterParam(event, 'id')
   if (!Number(id)) {
     throw Error('Id should be number.')
@@ -159,7 +143,7 @@ export async function update<T extends PgTableWithColumns<any>, S extends z.ZodO
   const m2m = Object.fromEntries(accessorKeys.map((accessorKey) => [accessorKey, validatedBody[accessorKey] || []]))
   const newData = Object.fromEntries(Object.entries(validatedBody).filter(([key]) => !accessorKeys.includes(key)))
 
-  await db.transaction(async (tx) => {
+  const res = await db.transaction(async (tx) => {
     const response = await tx
       .update(model)
       // @ts-ignore
@@ -185,6 +169,7 @@ export async function update<T extends PgTableWithColumns<any>, S extends z.ZodO
     }
     return response[0]
   })
+  return res
 }
 
 interface DeleteOptions<T extends PgTableWithColumns<any>> {
