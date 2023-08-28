@@ -8,7 +8,7 @@ import { eq } from 'drizzle-orm'
 interface CreateOptions<T extends PgTableWithColumns<any>> {
   model: T
   schema: z.ZodObject<any>
-  manyToManyRelationships: {
+  manyToManyRelationships?: {
     model: PgTableWithColumns<any>
     accessorKey: string
     foreignKey: string
@@ -115,30 +115,76 @@ export async function retrieve<T extends PgTableWithColumns<any>, S extends z.Zo
   return schema.parse(response[0]!) as ReturnType<S['parse']>
 }
 
-interface UpdateOptions<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>> {
+interface UpdateOptions<T extends PgTableWithColumns<any>, S extends z.ZodObject<any>> {
   model: T
   schema: S
+  manyToManyRelationships?: {
+    model: PgTableWithColumns<any>
+    accessorKey: string
+    foreignKey: string
+    foreignKeyAccessor: string
+  }[]
 }
 
-export async function update<T extends PgTableWithColumns<any>, S extends z.ZodSchema<any>>(
+export async function update<T extends PgTableWithColumns<any>, S extends z.ZodObject<any>>(
   event: H3Event,
-  { model, schema }: UpdateOptions<T, S>
+  { model, schema, manyToManyRelationships = [] }: UpdateOptions<T, S>
 ) {
+  // const id = getRouterParam(event, 'id')
+  // if (!Number(id)) {
+  //   throw Error('Id should be number.')
+  // }
+  // const body = await readBody(event)
+  // const validatedBody = schema.parse(body)
+  // const response = await db
+  //   .update(model)
+  //   .set(validatedBody)
+  //   .where(eq(model.id, Number(id)))
+  //   .returning()
+  // if (!response.length) {
+  //   throw Error('Resource not found.')
+  // }
+  // return response[0]!
+
   const id = getRouterParam(event, 'id')
   if (!Number(id)) {
     throw Error('Id should be number.')
   }
   const body = await readBody(event)
-  const validatedBody = schema.parse(body)
-  const response = await db
-    .update(model)
-    .set(validatedBody)
-    .where(eq(model.id, Number(id)))
-    .returning()
-  if (!response.length) {
-    throw Error('Resource not found.')
-  }
-  return response[0]!
+  const accessorKeys = manyToManyRelationships.map(({ accessorKey }) => accessorKey)
+  const extendedSchema = schema.extend(
+    Object.fromEntries(accessorKeys.map((accessorKey) => [accessorKey, z.array(z.number()).optional()]))
+  )
+  const validatedBody = extendedSchema.parse(body)
+  const m2m = Object.fromEntries(accessorKeys.map((accessorKey) => [accessorKey, validatedBody[accessorKey] || []]))
+  const newData = Object.fromEntries(Object.entries(validatedBody).filter(([key]) => !accessorKeys.includes(key)))
+
+  await db.transaction(async (tx) => {
+    const response = await tx
+      .update(model)
+      // @ts-ignore
+      .set(newData)
+      .where(eq(model.id, Number(id)))
+      .returning()
+    if (m2m) {
+      for (const [accessorKey, values] of Object.entries(m2m)) {
+        const m2mrelationship = manyToManyRelationships.find(({ accessorKey: ak }) => ak === accessorKey)
+        // @ts-ignore
+        await tx.delete(m2mrelationship!.model).where(eq(m2mrelationship!.model[m2mrelationship.foreignKey], id))
+        await tx
+          .insert(m2mrelationship!.model)
+          .values(
+            values.map((value) => ({
+              [m2mrelationship!.foreignKey]: id,
+              [m2mrelationship!.foreignKeyAccessor]: value,
+            }))
+          )
+          .onConflictDoNothing()
+          .returning()
+      }
+    }
+    return response[0]
+  })
 }
 
 interface DeleteOptions<T extends PgTableWithColumns<any>> {
