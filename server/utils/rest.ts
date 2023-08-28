@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { db } from '../../drizzle/db'
-import { PgTableWithColumns } from 'drizzle-orm/pg-core'
+import { PgTableWithColumns, getTableConfig } from 'drizzle-orm/pg-core'
 import { H3Event } from 'h3'
 import { sql } from 'drizzle-orm'
 import { eq } from 'drizzle-orm'
@@ -71,11 +71,13 @@ export async function list<T extends PgTableWithColumns<any>, S extends z.ZodSch
 
   const pageSize = config.pageSize || 10
 
-  const results = await db
-    .select()
-    .from(model)
-    .limit(pageSize)
-    .offset((page - 1) * pageSize)
+  const { name } = getTableConfig(model) as { name: keyof typeof db.query }
+
+  // @ts-ignore
+  const results = await db.query[name].findMany({
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+  })
 
   const totalCount = await db.select({ count: sql<number>`count(*)` }).from(model)
 
